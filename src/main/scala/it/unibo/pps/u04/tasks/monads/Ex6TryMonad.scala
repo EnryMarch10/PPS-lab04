@@ -1,20 +1,19 @@
-package it.unibo.pps.tasks.monads
+package it.unibo.pps.u04.tasks.monads
 
-import it.unibo.pps.u04.monads.Monads.Monad
 import it.unibo.pps.u04.monads.Monads.Monad
 
 /**
-  * Exercise 6: 
-    This module contains the implementation of a Try monad, which is a monad that 
-    represents a computation that may fail. 
-    Try to follow these steps:
-    - Look at the implementation of Try, that is similar to the one of Optional
-    - Try go define the Monad instance for Try
-      - flatMap should consider only the Success case
-      - in case of Failure, it should return the exception (fail fast)
-    - Verify that the main works as expected
+  * Exercise 6:
+  *  This module contains the implementation of a Try monad, which is a monad that
+  *  represents a computation that may fail.
+  *  Try to follow these steps:
+  *  - Look at the implementation of Try, that is similar to the one of Optional
+  *  - Try go define the Monad instance for Try
+  *  - flatMap should consider only the Success case
+  *  - in case of Failure, it should return the exception (fail fast)
+  *  - Verify that the main works as expected
   */
-object Ex6TryModel:
+object Ex6TryMonad:
   private enum TryImpl[A]:
     case Success(value: A)
     case Failure(exception: Throwable)
@@ -25,28 +24,28 @@ object Ex6TryModel:
   def failure[A](exception: Throwable): Try[A] = TryImpl.Failure(exception)
   def exec[A](expression: => A): Try[A] = try success(expression) catch failure(_)
 
-  extension [A](m: Try[A]) 
+  extension [A](m: Try[A])
     def getOrElse[B >: A](other: B): B = m match
       case TryImpl.Success(value) => value
       case TryImpl.Failure(_) => other
 
   given Monad[Try] with
     override def unit[A](value: A): Try[A] = ???
-    extension [A](m: Try[A]) 
+    extension [A](m: Try[A])
 
-      override def flatMap[B](f: A => Try[B]): Try[B] = ??? 
-      
-@main def main: Unit = 
-  import Ex6TryModel.*
+      override def flatMap[B](f: A => Try[B]): Try[B] = ???
 
-  val result = for 
+@main def main: Unit =
+  import Ex6TryMonad.*
+
+  val result = for
     a <- success(10)
     b <- success(30)
   yield a + b
 
   assert(result.getOrElse(-1) == 40)
 
-  val result2 = for 
+  val result2 = for
     a <- success(10)
     b <- failure(new RuntimeException("error"))
     c <- success(30)

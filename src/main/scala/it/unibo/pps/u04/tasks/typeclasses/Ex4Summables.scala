@@ -1,4 +1,4 @@
-package it.unibo.pps.tasks.typeclasses
+package it.unibo.pps.u04.tasks.typeclasses
 
 import it.unibo.pps.u03.Sequences.Sequence, Sequence.*
 

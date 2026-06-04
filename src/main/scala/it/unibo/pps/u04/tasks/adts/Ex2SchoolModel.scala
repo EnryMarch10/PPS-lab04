@@ -1,14 +1,14 @@
-package it.unibo.pps.tasks.adts
+package it.unibo.pps.u04.tasks.adts
 
 import it.unibo.pps.u03.extensionmethods.Sequences.Sequence, Sequence.*
 
-/*  Exercise 2: 
+/*  Exercise 2:
  *  Implement the below trait, and write a meaningful test.
  *  Suggestions:
  *  - reuse Sequences and Optionals as imported above
  *  - For other suggestions look directly to the methods and their description
  */
-object SchoolModel:
+object Ex2SchoolModel:
 
   trait SchoolModule:
     type School
@@ -24,6 +24,7 @@ object SchoolModel:
      * @return the teacher created
      */
     def teacher(name: String): Teacher
+
     /**
      * This a factory method for create a course from a name
      * e.g.,
@@ -43,8 +44,9 @@ object SchoolModel:
      * @return the empty school
      */
     def emptySchool: School
-    
+
     extension (school: School)
+
       /**
        * This method should return the list of courses
        * e.g.,
@@ -57,6 +59,7 @@ object SchoolModel:
        * @return the list of courses
        */
       def courses: Sequence[String]
+
       /**
        * This method should return the list of teachers
        * e.g.,
@@ -70,6 +73,7 @@ object SchoolModel:
        * @return the list of teachers
        */
       def teachers: Sequence[String]
+
       /**
        * This method should return a new school with the teacher assigned to the course
        * e.g.,
@@ -77,6 +81,7 @@ object SchoolModel:
        *   .setTeacherToCourse(teacher("John"), course("Math")) // => School(courses = Cons("Math", Nil()), teachers = Cons("John", Nil()), teacherToCourses = Cons(("John", "Math"), Nil()))
        *  */
       def setTeacherToCourse(teacher: Teacher, course: Course): School
+
       /**
        * This method should return the list of courses assigned to a teacher
        * e.g.,
@@ -91,6 +96,7 @@ object SchoolModel:
        * @return the list of courses assigned to a teacher
        */
       def coursesOfATeacher(teacher: Teacher): Sequence[Course]
+
       /**
        * This method should return true if the teacher is present in the school
        * e.g.,
@@ -101,6 +107,7 @@ object SchoolModel:
        *
        */
       def hasTeacher(name: String): Boolean
+
       /**
        * This method should return true if the course is present in the school
        * e.g.,
@@ -111,22 +118,31 @@ object SchoolModel:
        *
        */
       def hasCourse(name: String): Boolean
-  object BasicSchoolModule extends SchoolModule:
-    override type School = Nothing
-    override type Teacher = Nothing
-    override type Course = Nothing
 
-    def teacher(name: String): Teacher = ???
-    def course(name: String): Course = ???
-    def emptySchool: School = ???
+  object BasicSchoolModule extends SchoolModule:
+    private case class SchoolImpl(teachers: Sequence[Teacher] = Nil(),
+                                  courses: Sequence[Course] = Nil(),
+                                  teacherToCourses: Sequence[(Teacher, Sequence[Course])] = Nil())
+    opaque override type School = SchoolImpl // Nothing
+    opaque override type Teacher = String // Nothing
+    opaque override type Course = String // Nothing
+
+    def teacher(name: String): Teacher = name
+    def course(name: String): Course = name
+    def emptySchool: School = SchoolImpl()
 
     extension (school: School)
-      def courses: Sequence[String] = ???
-      def teachers: Sequence[String] = ???
-      def setTeacherToCourse(teacher: Teacher, course: Course): School = ???
-      def coursesOfATeacher(teacher: Teacher): Sequence[Course] = ???
+      def courses: Sequence[String] = school.courses
+      def teachers: Sequence[String] = school.teachers
+      def setTeacherToCourse(teacher: Teacher, course: Course): School =
+        if school.teacherToCourses.filter(tc => tc._1 == teacher).size() > 0
+          then school.teacherToCourses.map(tc => if tc._1 == teacher then tc._2 = Nil())
+        else ???
+      def coursesOfATeacher(teacher: Teacher): Sequence[Course] =
+        school.teacherToCourses.filter(tc => tc._1 == teacher).map(tc => tc._2).first().getOrElse(Nil())
       def hasTeacher(name: String): Boolean = ???
       def hasCourse(name: String): Boolean = ???
+
 @main def examples(): Unit =
   import SchoolModel.BasicSchoolModule.*
   val school = emptySchool
@@ -150,5 +166,3 @@ object SchoolModel:
   println(school3.hasCourse("Math")) // true
   println(school3.hasCourse("Italian")) // true
   println(school3.coursesOfATeacher(john)) // Cons("Math", Cons("Italian", Nil()))
-
-

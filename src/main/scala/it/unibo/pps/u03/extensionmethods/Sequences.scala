@@ -1,5 +1,7 @@
 package it.unibo.pps.u03.extensionmethods
 
+import scala.annotation.tailrec
+
 object Sequences:
   
   enum Sequence[E]:
@@ -15,19 +17,28 @@ object Sequences:
 
     extension [A](l: Sequence[A])
 
+      def filter(predicate: A => Boolean): Sequence[A] = l match
+        case Cons(h, t) if predicate(h) => Cons(h, t.filter(predicate))
+        case Cons(_, t)                 => t.filter(predicate)
+        case _                          => Nil()
+        
       def map[B](mapper: A => B): Sequence[B] = l match
         case Cons(h, t) => Cons(mapper(h), t.map(mapper))
         case Nil()      => Nil()
 
-      def filter(pred: A => Boolean): Sequence[A] = l match
-        case Cons(h, t) if pred(h) => Cons(h, t.filter(pred))
-        case Cons(_, t)            => t.filter(pred)
-        case Nil()                 => Nil()
+      def first(): Option[A] = l match
+        case Cons(h, t) => Some(h)
+        case _ => None
+    
+      @tailrec
+      def size(): Int = l match
+        case Cons(_, t) => 1 + t.size()
+        case _ => 0
 
     def of[A](n: Int, a: A): Sequence[A] =
       if (n == 0) then Nil[A]() else Cons(a, of(n - 1, a))
 
-@main def trySequences() =
+@main def trySequences(): Unit =
   import Sequences.*
   import Sequence.*
   
