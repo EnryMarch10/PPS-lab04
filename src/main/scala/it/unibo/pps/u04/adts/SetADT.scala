@@ -1,6 +1,7 @@
 package it.unibo.pps.u04.adts
 
-import it.unibo.pps.u03.extensionmethods.Sequences.Sequence, Sequence.*
+import it.unibo.pps.u03.extensionmethods.Sequences.Sequence
+import it.unibo.pps.u03.extensionmethods.Sequences.Sequence.{Cons, Nil}
 
 object SetADT:
   opaque type Set[A] = Sequence[A]

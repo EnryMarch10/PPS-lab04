@@ -1,6 +1,7 @@
 package it.unibo.pps.u04.tasks.adts
 
-import it.unibo.pps.u03.extensionmethods.Sequences.Sequence, Sequence.*
+import it.unibo.pps.u04.adts.SequenceADT
+import it.unibo.pps.u04.adts.SequenceADT.{Sequence, cons, nil}
 
 /*  Exercise 2:
  *  Implement the below trait, and write a meaningful test.
@@ -8,7 +9,7 @@ import it.unibo.pps.u03.extensionmethods.Sequences.Sequence, Sequence.*
  *  - reuse Sequences and Optionals as imported above
  *  - For other suggestions look directly to the methods and their description
  */
-object Ex2SchoolModel:
+object Ex2SchoolModule:
 
   trait SchoolModule:
     type School
@@ -120,9 +121,10 @@ object Ex2SchoolModel:
       def hasCourse(name: String): Boolean
 
   object BasicSchoolModule extends SchoolModule:
-    private case class SchoolImpl(teachers: Sequence[Teacher] = Nil(),
-                                  courses: Sequence[Course] = Nil(),
-                                  teacherToCourses: Sequence[(Teacher, Sequence[Course])] = Nil())
+    private case class TeacherCourses(teacher: Teacher, courses: Sequence[Course])
+    private case class SchoolImpl(teachers: Sequence[Teacher] = nil(),
+                                  courses: Sequence[Course] = nil(),
+                                  teachersCourses: Sequence[TeacherCourses] = nil())
     opaque override type School = SchoolImpl // Nothing
     opaque override type Teacher = String // Nothing
     opaque override type Course = String // Nothing
@@ -135,16 +137,41 @@ object Ex2SchoolModel:
       def courses: Sequence[String] = school.courses
       def teachers: Sequence[String] = school.teachers
       def setTeacherToCourse(teacher: Teacher, course: Course): School =
-        if school.teacherToCourses.filter(tc => tc._1 == teacher).size() > 0
-          then school.teacherToCourses.map(tc => if tc._1 == teacher then tc._2 = Nil())
-        else ???
+        val teachers =
+          if !school.teachers.contains(teacher) then
+            cons(teacher, school.teachers)
+          else
+            school.teachers
+        val courses =
+          if !school.courses.contains(course) then
+            cons(course, school.courses)
+          else
+            school.courses
+        val teacherCourses = school.teachersCourses.filter(tc => tc.teacher == teacher).first()
+        val teachersCourses = if teacherCourses.isDefined then
+          school.teachersCourses.map(tc =>
+            if tc.teacher != teacher then
+              TeacherCourses(tc.teacher, tc.courses)
+            else
+              TeacherCourses(teacher,
+                if tc.courses.contains(course) then
+                  tc.courses
+                else
+                  cons(course, tc.courses)
+              )
+          )
+        else
+          cons(TeacherCourses(teacher, cons(course, nil())), school.teachersCourses)
+        SchoolImpl(teachers, courses, teachersCourses)
       def coursesOfATeacher(teacher: Teacher): Sequence[Course] =
-        school.teacherToCourses.filter(tc => tc._1 == teacher).map(tc => tc._2).first().getOrElse(Nil())
-      def hasTeacher(name: String): Boolean = ???
-      def hasCourse(name: String): Boolean = ???
+        school.teachersCourses.filter(tc => tc.teacher == teacher).map(tc => tc.courses).first().getOrElse(nil())
+      def hasTeacher(name: String): Boolean =
+        school.teachersCourses.has(tc => tc.teacher == name)
+      def hasCourse(name: String): Boolean =
+        school.teachersCourses.has(tc => tc.courses.contains(name))
 
 @main def examples(): Unit =
-  import SchoolModel.BasicSchoolModule.*
+  import Ex2SchoolModule.BasicSchoolModule.*
   val school = emptySchool
   println(school.teachers) // Nil()
   println(school.courses) // Nil()

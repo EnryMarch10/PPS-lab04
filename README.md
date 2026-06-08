@@ -17,8 +17,8 @@ Third laboratory about functional programming using **Scala**.
 - Look at the package `tasks.adts` in the `u04` package.
 - **Task 1**: complete the `Ex1ComplexNumbers` module so that it passes the tests (`ComplexNumbersTest`).
   - Thinking at the ADT, what is the best way to represent a complex number?
-- **Task 2**: implement the `Ex2SchoolModel` module along with the `SchoolModelTest` test.
-  - Follow the suggestions in the comments of the `Ex2SchoolModel` module.
+- **Task 2**: implement the `Ex2SchoolModule` module along with the `SchoolModuleTest` test.
+  - Follow the suggestions in the comments of the `Ex2SchoolModule` module.
 - **Task 3**: implement the `Ex3Stacks` along with the `StacksTest` test.
   - Follow the suggestions in the comments of the `Ex3Stacks` module.
 
