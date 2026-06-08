@@ -1,7 +1,7 @@
 package it.unibo.pps.tasks.typeclasses
 
 import org.junit.Test
-import org.junit.Assert.{assertEquals, assertFalse, assertTrue}
+import org.junit.Assert.assertEquals
 
 import it.unibo.pps.u03.Sequences.Sequence.{Cons, Nil}
 import it.unibo.pps.u04.tasks.typeclasses.Ex4Summables.{sumAll, sumAllInt}

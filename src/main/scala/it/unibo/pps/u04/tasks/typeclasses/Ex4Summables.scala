@@ -7,7 +7,6 @@ import it.unibo.pps.u03.Sequences.Sequence, Sequence.*
  *  - Write givens also for Summable[Double], Summable[String]
  *  - Uncomment in the main and check if everything works
  */
-
 object Ex4Summables:
 
   def sumAllInt(seq: Sequence[Int]): Int = seq match

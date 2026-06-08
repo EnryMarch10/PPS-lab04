@@ -2,6 +2,7 @@ package it.unibo.pps.tasks.adts
 
 import org.junit.*
 import org.junit.Assert.*
+
 import it.unibo.pps.u04.tasks.adts.Ex1ComplexNumbers.*
 
 /* Tests should be clear, but note they are expressed independently of the

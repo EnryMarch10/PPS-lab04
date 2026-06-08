@@ -1,6 +1,9 @@
 package it.unibo.pps.u04.tasks.monads
 
 import it.unibo.pps.u04.monads.Monads.Monad
+import it.unibo.pps.u04.tasks.monads.Ex6TryMonad.failure
+
+import scala.util.Success
 
 /**
   * Exercise 6:
@@ -22,7 +25,7 @@ object Ex6TryMonad:
 
   def success[A](value: A): Try[A] = TryImpl.Success(value)
   def failure[A](exception: Throwable): Try[A] = TryImpl.Failure(exception)
-  def exec[A](expression: => A): Try[A] = try success(expression) catch failure(_)
+  def exec[A](expression: => A): Try[A] = try success(expression) catch { case e: Throwable => failure(e) }
 
   extension [A](m: Try[A])
     def getOrElse[B >: A](other: B): B = m match
@@ -30,10 +33,13 @@ object Ex6TryMonad:
       case TryImpl.Failure(_) => other
 
   given Monad[Try] with
-    override def unit[A](value: A): Try[A] = ???
-    extension [A](m: Try[A])
+    override def unit[A](value: A): Try[A] = TryImpl.Success(value)
 
-      override def flatMap[B](f: A => Try[B]): Try[B] = ???
+    extension [A](m: Try[A])
+      override def flatMap[B](f: A => Try[B]): Try[B] =
+        m match
+          case TryImpl.Success(a) => f(a)
+          case TryImpl.Failure(e) => failure(e) //Failure(e) => failure(e)
 
 @main def main: Unit =
   import Ex6TryMonad.*
@@ -41,8 +47,8 @@ object Ex6TryMonad:
   val result = for
     a <- success(10)
     b <- success(30)
+    c <- exec(new Throwable()) // Exception is returned not throw!
   yield a + b
-
   assert(result.getOrElse(-1) == 40)
 
   val result2 = for
@@ -50,7 +56,6 @@ object Ex6TryMonad:
     b <- failure(new RuntimeException("error"))
     c <- success(30)
   yield a + c
-
   assert(success(20).map(_ + 10).getOrElse(-1) == 30)
   assert(result2.getOrElse(-1) == -1)
 
@@ -59,3 +64,4 @@ object Ex6TryMonad:
     b <- exec(throw new RuntimeException("error"))
     c <- exec(30)
   yield a + c
+  assert(result3.getOrElse(-1) == -1)
